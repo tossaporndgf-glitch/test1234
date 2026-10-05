@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>AR Sailing Ship Storm</title>
+ 
+https://aframe.io/releases/1.4.2/aframe.min.jsscript>
+https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.jsscript>
+ 
+<style>
+body{
+margin:0;
+overflow:hidden;
+font-family:Arial,sans-serif;
+}
+ 
+#ui{
+position:fixed;
+bottom:20px;
+left:20px;
+z-index:9999;
+}
+ 
+button{
+padding:12px 18px;
+margin:5px;
+border:none;
+border-radius:8px;
+background:#1565C0;
+color:white;
+font-size:16px;
+cursor:pointer;
+}
+ 
+#status{
+margin-top:10px;
+background:rgba(0,0,0,.7);
+color:white;
+padding:10px;
+border-radius:8px;
+}
+</style>
+</head>
+ 
+<body>
+ 
+<div id="ui">
+<button onclick="startStorm()">🌪️ เริ่มลมพายุ</button>
+<button onclick="stopStorm()">🛑 หยุดลมพายุ</button>
+ 
+<div id="status">
+สถานะ :
+<span id="stormStatus">ลมสงบ</span>
+</div>
+</div>
+ 
+<a-scene
+embedded
+vr-mode-ui="enabled:false"
+renderer="logarithmicDepthBuffer:true;"
+arjs="trackingMethod:best;sourceType:webcam;debugUIEnabled:false;">
+ 
+<a-marker preset="hiro">
+ 
+<!-- กลุ่มเรือ -->
+ 
+<a-entity id="ship">
+ 
+<!-- ตัวเรือ -->
+ 
+<a-box
+position="0 0.15 0"
+width="1.4"
+height="0.3"
+depth="0.5"
+color="#8D6E63">
+</a-box>
+ 
+<!-- หัวเรือ -->
+ 
+<a-cone
+position="0.8 0.15 0"
+radius-bottom="0.25"
+radius-top="0"
+height="0.4"
+rotation="0 0 -90"
+color="#8D6E63">
+</a-cone>
+ 
+<!-- เสากระโดง -->
+ 
+<a-cylinder
+position="0 1 0"
+radius="0.03"
+height="1.8"
+color="#5D4037">
+</a-cylinder>
+ 
+<!-- ใบเรือ -->
+ 
+<a-plane
+id="sail"
+position="0.3 1.1 0"
+width="0.8"
+height="1.0"
+color="#FFF8E1">
+</a-plane>
+ 
+</a-entity>
+ 
+<!-- เมฆพายุ -->
+ 
+<a-sphere
+id="cloud1"
+position="1 2 0"
+radius="0.15"
+color="#757575">
+</a-sphere>
+ 
+<a-sphere
+id="cloud2"
+position="-1 2 0"
+radius="0.15"
+color="#616161">
+</a-sphere>
+ 
+<a-sphere
+id="cloud3"
+position="0 2 1"
+radius="0.15"
+color="#9E9E9E">
+</a-sphere>
+ 
+</a-marker>
+ 
+<a-entity camera></a-entity>
+ 
+</a-scene>
+ 
+<script>
+ 
+let storm = false;
+ 
+const statusText =
+document.getElementById("stormStatus");
+ 
+function startStorm(){
+storm = true;
+statusText.innerText = "พายุแรง";
+}
+ 
+function stopStorm(){
+storm = false;
+statusText.innerText = "ลมสงบ";
+ 
+document.querySelector("#ship")
+.setAttribute("rotation","0 0 0");
+ 
+document.querySelector("#sail")
+.setAttribute("rotation","0 0 0");
+}
+ 
+AFRAME.registerComponent("storm-effect",{
+ 
+tick:function(time){
+ 
+if(!storm) return;
+ 
+const ship =
+document.querySelector("#ship");
+ 
+const sail =
+document.querySelector("#sail");
+ 
+const wave =
+Math.sin(time * 0.005);
+ 
+ship.setAttribute(
+"rotation",
+`${wave*8} 0 ${wave*12}`
+);
+ 
+sail.setAttribute(
+"rotation",
+`0 ${wave*20} 0`
+);
+ 
+const c1 =
+document.querySelector("#cloud1");
+ 
+const c2 =
+document.querySelector("#cloud2");
+ 
+const c3 =
+document.querySelector("#cloud3");
+ 
+c1.setAttribute(
+"position",
+`${Math.cos(time*0.002)*1.2} 2 ${Math.sin(time*0.002)*1.2}`
+);
+ 
+c2.setAttribute(
+"position",
+`${Math.cos(time*0.003+2)*1.2} 2 ${Math.sin(time*0.003+2)*1.2}`
+);
+ 
+c3.setAttribute(
+"position",
+`${Math.cos(time*0.004+4)*1.2} 2 ${Math.sin(time*0.004+4)*1.2}`
+);
+ 
+}
+});
+ 
+window.addEventListener("load",()=>{
+ 
+document
+.querySelector("a-marker")
+.setAttribute("storm-effect","");
+ 
+});
+ 
+</script>
+ 
+</body>
+</html>
